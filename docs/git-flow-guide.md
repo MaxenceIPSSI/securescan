@@ -43,7 +43,7 @@ git switch -c abc/1
 ```bash
 # ... modifications ...
 git add .
-git commit -m "feat: description de la fonctionnalité"
+git commit -m "(feat/fix/chore): description de la fonctionnalité"
 ```
 
 ### 4. Pousser la branche

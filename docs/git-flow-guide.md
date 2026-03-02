@@ -43,7 +43,7 @@ git switch -c abc/1
 ```bash
 # ... modifications ...
 git add .
-git commit -m "(feat/fix/chore): description de la fonctionnalité"
+git commit -m "feat: description de la fonctionnalité"
 ```
 
 ### 4. Pousser la branche
@@ -61,7 +61,24 @@ Sur GitHub / GitLab, ouvrir une **Merge Request** :
 - **Source :** `abc/1`
 - **Target :** `staging`
 - Assigner des reviewers
-- Une fois approuvée → **Squash and Merge**
+
+### 6. Une fois la MR approuvée — Merger et nettoyer
+
+Quand les reviewers ont validé :
+
+1. Sélectionner **Squash and Merge** (regroupe tous tes commits en un seul commit propre dans staging)
+2. Confirmer le merge
+3. Cliquer sur **Delete branch** pour supprimer la branche distante
+
+> Le squash and merge garde l'historique de staging propre : une feature = un commit, au lieu d'avoir tous tes commits intermédiaires (WIP, fix typo, etc.).
+
+Puis en local, nettoyer ta branche :
+
+```bash
+git switch staging
+git pull origin staging
+git branch -d abc/1   # supprime la branche en local
+```
 
 ---
 

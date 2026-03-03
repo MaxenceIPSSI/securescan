@@ -1,11 +1,11 @@
-import { execFile } from 'child_process';
-import { promisify } from 'util';
-import path from 'path';
-import crypto from 'crypto';
+const { execFile } = require('child_process');
+const { promisify } = require('util');
+const path = require('path');
+const crypto = require('crypto');
 
 const execFileAsync = promisify(execFile);
 
-export async function cloneRepo(githubUrl, token = null) {
+async function cloneRepo(githubUrl, token = null) {
   if (!githubUrl.match(/^https:\/\/github\.com\/[\w.-]+\/[\w.-]+(\.git)?$/)) {
     throw new Error('URL GitHub invalide');
   }
@@ -23,3 +23,5 @@ export async function cloneRepo(githubUrl, token = null) {
 
   return destPath;
 }
+
+module.exports = { cloneRepo };

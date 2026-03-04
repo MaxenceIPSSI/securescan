@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body id="loginPage">
+
+   
+    <div class="top-bar">
+        <div class="logo">Mon Blog 🪻</div>
+        <div class="auth-buttons">
+            <button onclick="window.location.href='/index.html'">Accueil</button>
+        </div>
+    </div>
+
+   
+    <div class="login-container">
+        <h2>Connexion</h2>
+        <br>
+        <form id="loginForm" action="javascript:void(0)">
+            <input type="text" name="userName" placeholder="Nom d'utilisateur" required>
+            <input type="password" name="password" placeholder="Mot de passe" required>
+            <button type="submit">Se connecter</button>
+        </form>
+        <a href="#">Mot de passe oublié ?</a>
+    </div>
+
+    <script src="/js/login.js"></script>
+</body>
+</html>

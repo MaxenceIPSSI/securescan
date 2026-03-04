@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Créer un Article</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body id="createArticlePage">
+
+    
+    <div class="top-bar">
+        <div class="logo">Mon Blog 🪻</div>
+        <div class="auth-buttons">
+            <button onclick="window.location.href='/index.html'">Accueil</button>
+        </div>
+    </div>
+
+   
+    <div class="article-container">
+        <h1>Créer un nouvel article</h1>
+        <br>
+        <form id="createArticleForm">
+            <label>
+                <input type="text" name="title" placeholder="Titre de l'article" required>
+            </label>
+            <label>
+                <textarea name="content" placeholder="Contenu de l'article" rows="6" required></textarea>
+            </label>
+            <button type="submit">Poster</button>
+        </form>
+        <p id="message"></p>
+    </div>
+    <script type="module" src="/js/createArticle.js"></script>
+</body>
+</html>

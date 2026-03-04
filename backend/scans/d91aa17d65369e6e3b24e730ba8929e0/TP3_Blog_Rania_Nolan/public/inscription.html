@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body id="inscriptionPage">
+
+   
+    <div class="top-bar">
+        <div class="logo">Mon Blog 🪻</div>
+        <div class="auth-buttons">
+            <button onclick="window.location.href='/index.html'">Accueil</button>
+        </div>
+    </div>
+
+    
+    <div class="inscription-container">
+        <h1>Inscription</h1>
+        <br>
+        <form id="registerForm" class="inscriptionForm">
+            <input type="text" name="userName" placeholder="Nom d'utilisateur" required />
+            <input type="email" name="mail" placeholder="Email" required />
+            <input type="password" name="password" placeholder="Mot de passe" required />
+            <button type="submit">S'inscrire</button>
+        </form>
+        <p id="inscriptionMessage"></p>
+    </div>
+
+    <script src="/js/inscription.js"></script>
+</body>
+</html>

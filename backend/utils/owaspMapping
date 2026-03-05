@@ -1,0 +1,14 @@
+const cweToOwasp = {
+  "CWE-77": "A05: Injection",
+  "CWE-94": "A05: Injection",
+  "CWE-400": "A10: Mishandling of Exceptional Conditions",
+  "CWE-1333": "A10: Mishandling of Exceptional Conditions",
+  "CWE-1321": "A03: Software Supply Chain Failures"
+};
+
+export function mapCweToOwasp(cweInput) {
+  if (!cweInput) return ["Non dÃ©fini"];
+  const cweArray = Array.isArray(cweInput) ? cweInput : [cweInput];
+  const mapped = cweArray.map(cwe => cweToOwasp[cwe] || "A10: Mishandling of Exceptional Conditions");
+  return [...new Set(mapped)];
+}

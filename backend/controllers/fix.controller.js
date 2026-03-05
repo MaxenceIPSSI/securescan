@@ -44,10 +44,9 @@ exports.createFixPR = async (req, res) => {
     });
     if (!createBranchRes.ok) throw new Error(`Cannot create branch: ${await createBranchRes.text()}`);
 
-    // 3. Group findings by file (skip npm audit entries with line: null)
+    // 3. Group findings by file
     const byFile = {};
     for (const f of findings) {
-      if (f.line === null || f.line === undefined) continue;
       if (!byFile[f.file]) byFile[f.file] = [];
       byFile[f.file].push(f);
     }
@@ -58,6 +57,50 @@ exports.createFixPR = async (req, res) => {
     // 4. For each file: fetch → ask Claude → commit
     for (const [filePath, fileFindingsArr] of Object.entries(byFile)) {
       try {
+        // Handle package.json npm audit vulnerabilities separately
+        if (filePath === 'package.json' && fileFindingsArr.every(f => f.line === null)) {
+          const fileRes = await fetch(`${ghBase}/contents/${filePath}?ref=${branch}`, { headers });
+          if (!fileRes.ok) { skipped.push(`${filePath} (introuvable sur GitHub)`); continue; }
+          const fileData = await fileRes.json();
+          const originalContent = Buffer.from(fileData.content, 'base64').toString('utf-8');
+
+          const vulnList = fileFindingsArr.map(f => `- [${f.owasp}] ${f.desc}`).join('\n');
+
+          const message = await client.messages.create({
+            model: 'claude-sonnet-4-6',
+            max_tokens: 4096,
+            messages: [{
+              role: 'user',
+              content: `You are a security expert fixing a Node.js package.json file.
+The following vulnerable dependencies were detected by npm audit:
+${vulnList}
+
+For each vulnerable package, update the version constraint in "dependencies" or "devDependencies" to the latest safe version that fixes the vulnerability. If a package should be replaced by a safer alternative, do so.
+Do NOT change scripts, metadata, or any other field.
+Return ONLY the complete fixed package.json content, no explanation, no markdown fences.
+
+package.json:
+${originalContent}`,
+            }],
+          });
+
+          const fixedContent = message.content[0].text;
+          if (fixedContent.trim() === originalContent.trim()) { skipped.push(`${filePath} (aucun changement)`); continue; }
+
+          const commitRes = await fetch(`${ghBase}/contents/${filePath}`, {
+            method: 'PUT', headers,
+            body: JSON.stringify({
+              message: `fix: [SecureScan] mise à jour des dépendances vulnérables`,
+              content: Buffer.from(fixedContent).toString('base64'),
+              sha: fileData.sha,
+              branch: newBranch,
+            }),
+          });
+          if (!commitRes.ok) { skipped.push(`${filePath} (erreur de commit: ${await commitRes.text()})`); continue; }
+          fixed.push(filePath);
+          continue;
+        }
+
         // GET file content from GitHub
         const fileRes = await fetch(`${ghBase}/contents/${filePath}?ref=${branch}`, { headers });
         if (!fileRes.ok) {
@@ -69,19 +112,36 @@ exports.createFixPR = async (req, res) => {
 
         // Call Claude to fix the file
         const vulnList = fileFindingsArr
-          .map(f => `Ligne ${f.line}: [${f.owasp}] ${f.desc}`)
+          .filter(f => f.line !== null)
+          .map(f => `- Line ${f.line}: [${f.owasp}] ${f.desc}`)
           .join('\n');
 
         const message = await client.messages.create({
-          model: 'claude-haiku-4-5-20251001',
+          model: 'claude-sonnet-4-6',
           max_tokens: 8192,
           messages: [{
             role: 'user',
-            content: `You are a security expert. Fix ONLY the vulnerabilities listed below.\nReturn ONLY the complete fixed file content, no explanation, no markdown fences.\n\nFile: ${filePath}\n${originalContent}\n\nVulnerabilities:\n${vulnList}`,
+            content: `You are a security expert. Fix ONLY the vulnerabilities listed below in this file.
+
+Rules:
+- Preserve all existing functionality and logic — do not refactor or rename things
+- Replace dangerous patterns with safe equivalents (e.g. eval → JSON.parse, exec → execFile, serialize.unserialize → JSON.parse, hard-coded credentials → process.env.VAR)
+- Sanitize user input before using it in HTML responses or dynamic paths
+- Return ONLY the complete fixed file content, no explanation, no markdown fences
+
+File: ${filePath}
+\`\`\`
+${originalContent}
+\`\`\`
+
+Vulnerabilities to fix:
+${vulnList}`,
           }],
         });
 
-        const fixedContent = message.content[0].text;
+        const fixedContent = message.content[0].text
+          .replace(/^```[\w]*\n?/, '')
+          .replace(/\n?```$/, '');
 
         // Skip if Claude returned identical content
         if (fixedContent.trim() === originalContent.trim()) {

@@ -142,14 +142,6 @@ nav {
   padding: 0 24px 80px;
 }
 
-.cards-row {
-  display: flex;
-  align-items: stretch;
-  gap: 0;
-  width: 100%;
-  max-width: 820px;
-}
-
 /* ── CARD ── */
 .card {
   flex: 1;

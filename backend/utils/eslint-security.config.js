@@ -22,6 +22,10 @@ module.exports = [
       'no-eval':         'warn',
       'no-new-func':     'warn',
       'no-implied-eval': 'warn',
+      // Trop de faux positifs : flags tout obj[key] et tout fs.*(variable)
+      // sans considérer le contexte. Les vrais cas sont couverts par semgrep.
+      'security/detect-object-injection':       'off',
+      'security/detect-non-literal-fs-filename': 'off',
     },
   },
 ];

@@ -43,7 +43,7 @@ Chaque outil produit ces résultats au format JSON qui sont ensuite parsés et n
 
 ## Agrégation et classification
 
-Les résultats sont :
+Les résultats sont de :
 
 - fusionnés
 - normalisés

@@ -1,4 +1,4 @@
-import { SEVERITY_COLOR, OWASP_COLOR } from "./data";
+import { SEVERITY_COLOR, OWASP_COLOR, SEV_LABEL } from "./data";
 
 export default function FindingsTable({ filtered, total }) {
   return (
@@ -21,7 +21,7 @@ export default function FindingsTable({ filtered, total }) {
             {filtered.length === 0 ? (
               <tr><td colSpan={5}><div className="empty">Aucun résultat pour ces filtres</div></td></tr>
             ) : filtered.map((f, i) => {
-              const sev = SEVERITY_COLOR[f.severity] || SEVERITY_COLOR["Faible"];
+              const sev = SEVERITY_COLOR[f.severity] || SEVERITY_COLOR[1];
               return (
                 <tr key={i}>
                   <td className="td-file">{f.file}</td>
@@ -29,7 +29,7 @@ export default function FindingsTable({ filtered, total }) {
                   <td><span className="td-desc" title={f.desc}>{f.desc}</span></td>
                   <td>
                     <span className="badge-sev" style={{ background: sev.bg, color: sev.text, borderColor: sev.border }}>
-                      {f.severity}
+                      {SEV_LABEL[f.severity] ?? f.severity}
                     </span>
                   </td>
                   <td>

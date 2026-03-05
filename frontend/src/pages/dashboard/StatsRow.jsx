@@ -1,9 +1,7 @@
-import { SEVERITY_DATA } from "./data";
-
-export default function StatsRow() {
+export default function StatsRow({ severityData }) {
   return (
     <div className="stats-row">
-      {SEVERITY_DATA.map((s, i) => (
+      {severityData.map((s, i) => (
         <div className="stat-card" key={i}>
           <div className="stat-dot" style={{ background: s.color }} />
           <div>

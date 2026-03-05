@@ -10,7 +10,7 @@ export default function HomePage() {
     <>
       <Hero />
       <div className="cards-wrapper">
-        <div className="cards-row">
+        <div>
           <GithubCard />
           <Divider />
           <ZipCard />

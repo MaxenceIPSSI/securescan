@@ -5,35 +5,46 @@ const fs = require("fs").promises;
 
 // Lancer ESLint + npm audit + semgrep et retourner les résultats
 async function runFullScan(scanPath) {
-  let eslintResults = [];
-  let npmResults = {};
-  let semgrepResults = [];
+  let eslintFindings   = [];
+  let npmFindings      = [];
+  let semgrepFindings  = [];
 
   try {
     console.log("➡ Lancement ESLint sur:", scanPath);
-    eslintResults = await runEslint(scanPath);
-    console.log(`✅ ESLint terminé, fichiers scannés: ${eslintResults.length}`);
+    eslintFindings = await runEslint(scanPath);
+    console.log(`✅ ESLint terminé: ${eslintFindings.length} finding(s)`);
   } catch (err) {
     console.error("[ORCHESTRATOR ESLINT ERROR]", err);
   }
 
   try {
     console.log("➡ Lancement npm audit sur:", scanPath);
-    npmResults = await runNpmAudit(scanPath);
-    console.log(`✅ npm audit terminé, vulnérabilités détectées: ${Object.keys(npmResults).length}`);
+    npmFindings = await runNpmAudit(scanPath);
+    console.log(`✅ npm audit terminé: ${npmFindings.length} finding(s)`);
   } catch (err) {
     console.error("[ORCHESTRATOR NPM AUDIT ERROR]", err);
   }
 
   try {
     console.log("➡ Lancement Semgrep sur:", scanPath);
-    semgrepResults = await runSemgrep(scanPath);
-    console.log(`✅ Semgrep terminé, findings: ${semgrepResults.length}`);
+    semgrepFindings = await runSemgrep(scanPath);
+    console.log(`✅ Semgrep terminé: ${semgrepFindings.length} finding(s)`);
   } catch (err) {
     console.error("[ORCHESTRATOR SEMGREP ERROR]", err);
   }
 
-  return { eslint: eslintResults, npmAudit: npmResults, semgrep: semgrepResults };
+  // Déduplication inter-scanner : même fichier + même ligne + même catégorie OWASP
+  // → très probablement la même vulnérabilité détectée par deux outils différents.
+  // On priorise semgrep (plus riche en métadonnées) en le mettant en premier.
+  const seen = new Set();
+  const findings = [...semgrepFindings, ...eslintFindings, ...npmFindings].filter((f) => {
+    const key = `${f.file}:${f.line ?? 'null'}:${f.owasp}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+
+  return { findings };
 }
 
 // Orchestrateur complet + suppression automatique du dossier

@@ -26,3 +26,4 @@ dist-ssr
 #test files
 test-project/
 test-semgrep.js
+test-all-scanners.js

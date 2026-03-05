@@ -1,11 +1,13 @@
 const runEslint = require("../scanners/eslint.scanner");
 const runNpmAudit = require("../scanners/npmAudit.scanner");
+const runSemgrep = require("../scanners/semgrep.scanner");
 const fs = require("fs").promises;
 
-// Lancer ESLint + npm audit et retourner les résultats
+// Lancer ESLint + npm audit + semgrep et retourner les résultats
 async function runFullScan(scanPath) {
   let eslintResults = [];
   let npmResults = {};
+  let semgrepResults = [];
 
   try {
     console.log("➡ Lancement ESLint sur:", scanPath);
@@ -23,7 +25,15 @@ async function runFullScan(scanPath) {
     console.error("[ORCHESTRATOR NPM AUDIT ERROR]", err);
   }
 
-  return { eslint: eslintResults, npmAudit: npmResults };
+  try {
+    console.log("➡ Lancement Semgrep sur:", scanPath);
+    semgrepResults = await runSemgrep(scanPath);
+    console.log(`✅ Semgrep terminé, findings: ${semgrepResults.length}`);
+  } catch (err) {
+    console.error("[ORCHESTRATOR SEMGREP ERROR]", err);
+  }
+
+  return { eslint: eslintResults, npmAudit: npmResults, semgrep: semgrepResults };
 }
 
 // Orchestrateur complet + suppression automatique du dossier

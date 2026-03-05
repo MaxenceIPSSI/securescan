@@ -22,3 +22,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Env
+.env
+
+#test files
+test-project/
+test-semgrep.js
+test-all-scanners.js

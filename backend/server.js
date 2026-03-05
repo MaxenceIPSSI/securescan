@@ -21,7 +21,7 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'dev-secret',
   resave: false,
   saveUninitialized: false,
-  cookie: { httpOnly: true, sameSite: 'lax', secure: false },
+  cookie: { httpOnly: true, sameSite: 'lax', secure: false, domain: process.env.COOKIE_DOMAIN },
 }));
 
 // ─── GitHub OAuth ────────────────────────────────────────────────────────────

@@ -60,7 +60,7 @@ exports.scanGithub = async (req, res) => {
 
     console.log(`Scan du repository ${owner}/${repo}@${branch}`);
     const results = await runFullScan(cloneDir);
-    res.json(results);
+    res.json({ ...results, meta: { owner, repo, branch } });
 
   } catch (error) {
     console.error("[SCAN GITHUB ERROR]", error.message);

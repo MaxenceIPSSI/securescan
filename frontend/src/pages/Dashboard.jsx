@@ -1,6 +1,7 @@
 import "./Dashboard.css";
 import { Link, useLocation } from "react-router-dom";
 import { FINDINGS, computeDashboardData } from "./dashboard/data";
+import { generatePDF } from "./dashboard/generatePDF";
 import ScoreCard        from "./dashboard/ScoreCard";
 import SeverityBarChart from "./dashboard/SeverityBarChart";
 import OWASPPieChart    from "./dashboard/OWASPPieChart";
@@ -27,10 +28,9 @@ export default function Dashboard() {
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>
             Appliquer Corrections
           </button>
-          <button className="btn-blue">
+          <button className="btn-blue" onClick={() => generatePDF(findings, score, scoreLabel, scoreDesc)}>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
             Générer Rapport
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
         </div>
       </div>

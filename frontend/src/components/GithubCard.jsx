@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const API = "http://localhost:4000";
 
@@ -10,6 +11,9 @@ export default function GithubCard() {
   const [selectedBranch, setSelectedBranch] = useState("");
   const [branchesLoading, setBranchesLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isScanning, setIsScanning] = useState(false);
+  const [scanError, setScanError] = useState("");
+  const navigate = useNavigate();
 
   // Vérifie la session au montage
   useEffect(() => {
@@ -54,7 +58,6 @@ export default function GithubCard() {
     if (repo) {
       const [owner, name] = repo.full_name.split("/");
       loadBranches(owner, name).then(() => {
-        // Pré-sélectionner la branche par défaut
         setSelectedBranch(repo.default_branch || "");
       });
     }
@@ -69,7 +72,53 @@ export default function GithubCard() {
     setSelectedBranch("");
   }
 
+  async function handleAnalyze() {
+    if (!selectedRepo || !selectedBranch) return;
+    setIsScanning(true);
+    setScanError("");
+    const [owner, repo] = selectedRepo.full_name.split("/");
+    try {
+      const res = await fetch(`${API}/api/scan/github`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ owner, repo, branch: selectedBranch }),
+      });
+      if (!res.ok) throw new Error(await res.text());
+      const results = await res.json();
+      navigate("/dashboard", { state: { results } });
+    } catch (e) {
+      setScanError(e.message || "Une erreur est survenue lors du scan.");
+      setIsScanning(false);
+    }
+  }
+
   const canAnalyze = !!selectedRepo && !!selectedBranch;
+
+  // ── Scan overlay ─────────────────────────────────────────────────────────────
+
+  if (isScanning) {
+    return (
+      <div className="scan-overlay">
+        {scanError ? (
+          <>
+            <div className="scan-overlay-error">{scanError}</div>
+            <button className="scan-overlay-retry" onClick={() => { setScanError(""); setIsScanning(false); }}>
+              Retour
+            </button>
+          </>
+        ) : (
+          <>
+            <div className="scan-overlay-spinner" />
+            <div className="scan-overlay-title">Analyse en cours...</div>
+            <div className="scan-overlay-sub">
+              {selectedRepo?.full_name} · {selectedBranch}
+            </div>
+          </>
+        )}
+      </div>
+    );
+  }
 
   // ── États de rendu ──────────────────────────────────────────────────────────
 
@@ -148,7 +197,11 @@ export default function GithubCard() {
 
       {error && <div className="gh-error">{error}</div>}
 
-      <button className={`btn-analyze${canAnalyze ? " active" : ""}`} disabled={!canAnalyze}>
+      <button
+        className={`btn-analyze${canAnalyze ? " active" : ""}`}
+        disabled={!canAnalyze}
+        onClick={handleAnalyze}
+      >
         Analyser ce repository
       </button>
     </div>

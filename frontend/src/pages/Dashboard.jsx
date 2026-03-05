@@ -1,11 +1,15 @@
 import "./Dashboard.css";
 import { Link } from "react-router-dom";
-import { FINDINGS } from "./dashboard/data";
-import ScoreCard from "./dashboard/ScoreCard";
+import { FINDINGS, computeDashboardData } from "./dashboard/data";
+import ScoreCard        from "./dashboard/ScoreCard";
 import SeverityBarChart from "./dashboard/SeverityBarChart";
-import OWASPPieChart from "./dashboard/OWASPPieChart";
-import StatsRow from "./dashboard/StatsRow";
-import FindingsTable from "./dashboard/FindingsTable";
+import OWASPPieChart    from "./dashboard/OWASPPieChart";
+import StatsRow         from "./dashboard/StatsRow";
+import FindingsTable    from "./dashboard/FindingsTable";
+
+// Pour l'instant on passe les mock FINDINGS — quand le back sera branché,
+// on remplacera FINDINGS par les données reçues de l'API.
+const { score, scoreLabel, scoreDesc, severityData, owaspDist } = computeDashboardData(FINDINGS);
 
 export default function Dashboard() {
   return (
@@ -33,13 +37,13 @@ export default function Dashboard() {
 
       <div className="top-grid">
         <div className="left-col">
-          <ScoreCard />
-          <SeverityBarChart />
+          <ScoreCard score={score} scoreLabel={scoreLabel} scoreDesc={scoreDesc} />
+          <SeverityBarChart severityData={severityData} />
         </div>
-        <OWASPPieChart />
+        <OWASPPieChart owaspDist={owaspDist} />
       </div>
 
-      <StatsRow />
+      <StatsRow severityData={severityData} />
       <FindingsTable filtered={FINDINGS} total={FINDINGS.length} />
     </main>
   );

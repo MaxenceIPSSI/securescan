@@ -1,8 +1,14 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+const API = "http://localhost:4000";
 
 export default function ZipCard() {
   const [zipFile, setZipFile] = useState(null);
   const [dragOver, setDragOver] = useState(false);
+  const [isScanning, setIsScanning] = useState(false);
+  const [scanError, setScanError] = useState("");
+  const navigate = useNavigate();
 
   const handleDrop = (e) => {
     e.preventDefault();
@@ -16,11 +22,43 @@ export default function ZipCard() {
     if (file) setZipFile(file);
   };
 
-  const handleZipAnalyze = () => {
+  const handleZipAnalyze = async () => {
     if (!zipFile) return;
-    // TODO: POST /api/scan/zip avec FormData
-    console.log("Analyze ZIP:", zipFile.name);
+    setIsScanning(true);
+    setScanError("");
+    try {
+      const formData = new FormData();
+      formData.append("project", zipFile);
+      const res = await fetch(`${API}/api/scan/zip`, { method: "POST", body: formData });
+      if (!res.ok) throw new Error(await res.text());
+      const results = await res.json();
+      navigate("/dashboard", { state: { results } });
+    } catch (e) {
+      setScanError(e.message || "Une erreur est survenue lors du scan.");
+      setIsScanning(false);
+    }
   };
+
+  if (isScanning) {
+    return (
+      <div className="scan-overlay">
+        {scanError ? (
+          <>
+            <div className="scan-overlay-error">{scanError}</div>
+            <button className="scan-overlay-retry" onClick={() => { setScanError(""); setIsScanning(false); }}>
+              Retour
+            </button>
+          </>
+        ) : (
+          <>
+            <div className="scan-overlay-spinner" />
+            <div className="scan-overlay-title">Analyse en cours...</div>
+            <div className="scan-overlay-sub">Scan de {zipFile.name}</div>
+          </>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="card zip">
@@ -50,7 +88,7 @@ export default function ZipCard() {
           </svg>
         </div>
         <p>{dragOver ? "Déposez le fichier ici" : "Glissez votre .zip ou cliquez"}</p>
-        {zipFile && <p className="file-name">📦 {zipFile.name}</p>}
+        {zipFile && <p className="file-name">{zipFile.name}</p>}
       </div>
 
       <button

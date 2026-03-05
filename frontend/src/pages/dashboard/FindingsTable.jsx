@@ -8,6 +8,13 @@ export default function FindingsTable({ filtered, total }) {
       </div>
       <div className="table-wrap">
         <table>
+          <colgroup>
+            <col className="col-file" />
+            <col className="col-line" />
+            <col className="col-desc" />
+            <col className="col-sev" />
+            <col className="col-cat" />
+          </colgroup>
           <thead>
             <tr>
               <th>Fichier</th>

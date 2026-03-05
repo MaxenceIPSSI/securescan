@@ -187,7 +187,12 @@
   overflow: hidden;
 }
 
-table { width: 100%; border-collapse: collapse; }
+table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+col.col-file { width: 18%; }
+col.col-line { width: 7%; }
+col.col-desc { width: 35%; }
+col.col-sev  { width: 12%; }
+col.col-cat  { width: 28%; }
 thead tr { border-bottom: 1px solid var(--border); }
 
 th {
@@ -207,9 +212,9 @@ tbody tr:last-child { border-bottom: none; }
 tbody tr:hover { background: rgba(255,255,255,0.02); }
 td { padding: 13px 16px; font-size: 0.85rem; vertical-align: middle; }
 
-.td-file { font-family: 'DM Mono', monospace; font-size: 0.8rem; color: var(--blue); }
+.td-file { font-family: 'DM Mono', monospace; font-size: 0.8rem; color: var(--blue); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .td-line { font-family: 'DM Mono', monospace; font-size: 0.8rem; color: var(--muted); }
-.td-desc { color: var(--text); max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.td-desc { display: block; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 /* ── BADGES ── */
 .badge-sev {
@@ -225,11 +230,12 @@ td { padding: 13px 16px; font-size: 0.85rem; vertical-align: middle; }
 }
 
 .badge-owasp {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 6px;
   font-family: 'DM Mono', monospace;
   font-size: 0.75rem;
+  min-width: 0;
 }
 
 .owasp-pill {
@@ -243,7 +249,7 @@ td { padding: 13px 16px; font-size: 0.85rem; vertical-align: middle; }
 .owasp-cat {
   font-size: 0.75rem;
   color: var(--muted);
-  max-width: 140px;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

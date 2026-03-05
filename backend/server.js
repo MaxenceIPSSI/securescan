@@ -17,6 +17,7 @@ app.use(cors({
 app.use(express.json());
 
 app.use(session({
+  name:   'ssid',
   secret: process.env.SESSION_SECRET || 'dev-secret',
   resave: false,
   saveUninitialized: false,

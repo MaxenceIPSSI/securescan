@@ -86,7 +86,8 @@ export default function GithubCard() {
       });
       if (!res.ok) throw new Error(await res.text());
       const results = await res.json();
-      navigate("/dashboard", { state: { results } });
+      const meta = results.meta ?? null;
+      navigate("/dashboard", { state: { results, meta } });
     } catch (e) {
       setScanError(e.message || "Une erreur est survenue lors du scan.");
       setIsScanning(false);
